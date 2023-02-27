@@ -6,7 +6,7 @@ sidebar <- dashboardSidebar(
   sidebarMenu(
     menuItem("Load Data", icon = icon("bar-chart-o"),
              # Input: Select a file ----
-             fileInput("file1", "Choose CSV File",
+             fileInput("dataFile", "Choose CSV File",
                        multiple = FALSE,
                        accept = c("text/csv",
                                   "text/comma-separated-values,text/plain",
@@ -16,17 +16,17 @@ sidebar <- dashboardSidebar(
              tags$hr(),
              
              # Input: Checkbox if file has header ----
-             checkboxInput("header", "Header", TRUE),
+             checkboxInput("dataHeader", "Header", TRUE),
              
              # Input: Select separator ----
-             radioButtons("sep", "Separator",
+             radioButtons("dataSep", "Separator",
                           choices = c(Comma = ",",
                                       Semicolon = ";",
                                       Tab = "\t"),
                           selected = ","),
              
              # Input: Select quotes ----
-             radioButtons("quote", "Quote",
+             radioButtons("dataQuote", "Quote",
                           choices = c(None = "",
                                       "Double Quote" = '"',
                                       "Single Quote" = "'"),
@@ -36,7 +36,7 @@ sidebar <- dashboardSidebar(
              tags$hr(),
              
              # Input: Select number of rows to display ----
-             radioButtons("disp", "Display",
+             radioButtons("dataDisp", "Display",
                           choices = c(Head = "head",
                                       All = "all"),
                           selected = "head")
@@ -76,14 +76,17 @@ ui <- dashboardPage(
 
 server <- function(input, output) { 
   dataset <- reactive({
-    req(input$file1)
+    # input$file1 will be NULL initially. After the user selects
+    # and uploads a file, head of that data file by default,
+    # or all rows if selected, will be shown.
+    req(input$dataFile)
     
     tryCatch(
       {
-        df <- read.csv(input$file1$datapath,
-                       header = input$header,
-                       sep = input$sep,
-                       quote = input$quote)
+        df <- read.csv(input$dataFile$datapath,
+                       header = input$dataHeader,
+                       sep = input$dataSep,
+                       quote = input$dataQuote)
       },
       error = function(e) {
         # return a safeError if a parsing error occurs
@@ -91,7 +94,7 @@ server <- function(input, output) {
       }
     )
     
-    if(input$disp == "head") {
+    if(input$dataDisp == "head") {
       return(head(df))
     }
     else {
@@ -100,10 +103,6 @@ server <- function(input, output) {
   })
   
   output$contents <- renderTable({
-    
-    # input$file1 will be NULL initially. After the user selects
-    # and uploads a file, head of that data file by default,
-    # or all rows if selected, will be shown.
     
     dataset()
     
