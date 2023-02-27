@@ -50,12 +50,21 @@ sidebar <- dashboardSidebar(
 body <- dashboardBody(
   tabItems(
     tabItem(tabName = "eda_tab",
-            h2("EDA tab content"),
-            tableOutput("contents")
+            tabsetPanel(
+              tabPanel("Univariate",
+                       tableOutput("contents")), 
+              tabPanel("Bivariate",
+                       h2("Bivariate content")), 
+            ),
     ),
     
     tabItem(tabName = "ml_tab",
-            h2("Machine Learning tab content")
+            tabsetPanel(
+              tabPanel("Feature Engineering",
+                       h2("Feature Engineering things")), 
+              tabPanel("Machine Learning model",
+                       h2("Machine Learning tab content")), 
+            ),
     )
   )
 )
