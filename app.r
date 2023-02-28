@@ -1,89 +1,73 @@
 library(shiny)
-library(shinydashboard)
-library(shinyWidgets)
 
-sidebar <- dashboardSidebar(
-  sidebarMenu(
-    menuItem("Load Data", icon = icon("bar-chart-o"),
-             # Input: Select a file ----
-             fileInput("dataFile", "Choose CSV File",
-                       multiple = FALSE,
-                       accept = c("text/csv",
-                                  "text/comma-separated-values,text/plain",
-                                  ".csv")),
+# Define UI for data upload app ----
+ui <- fluidPage(
+  navbarPage("Navbar!",
+             tabPanel("Data",
+                      sidebarLayout(
+                        
+                        # Sidebar panel for inputs ----
+                        sidebarPanel(
+                          
+                          # Input: Select a file ----
+                          fileInput("dataFile", "Choose CSV File",
+                                    multiple = FALSE,
+                                    accept = c("text/csv",
+                                               "text/comma-separated-values,text/plain",
+                                               ".csv")),
+                          
+                          # Horizontal line ----
+                          tags$hr(),
+                          
+                          # Input: Checkbox if file has header ----
+                          checkboxInput("dataHeader", "Header", TRUE),
+                          
+                          # Input: Select separator ----
+                          radioButtons("dataSep", "Separator",
+                                       choices = c(Comma = ",",
+                                                   Semicolon = ";",
+                                                   Tab = "\t"),
+                                       selected = ","),
+                          
+                          # Input: Select quotes ----
+                          radioButtons("dataQuote", "Quote",
+                                       choices = c(None = "",
+                                                   "Double Quote" = '"',
+                                                   "Single Quote" = "'"),
+                                       selected = '"'),
+                          
+                          # Horizontal line ----
+                          tags$hr(),
+                          
+                          # Input: Select number of rows to display ----
+                          radioButtons("dataDisp", "Display",
+                                       choices = c(Head = "head",
+                                                   All = "all"),
+                                       selected = "head")
+                          
+                        ),
+                        mainPanel(
+                          # Output: Data file ----
+                          tableOutput("contents")
+                          
+                        )
+                      ),
+                      
+             ),
+             tabPanel("Machine Learning",
+                      h2("hello"))
              
-             # Horizontal line ----
-             tags$hr(),
+             # App title ----
              
-             # Input: Checkbox if file has header ----
-             checkboxInput("dataHeader", "Header", TRUE),
+             # Sidebar layout with input and output definitions ----
              
-             # Input: Select separator ----
-             radioButtons("dataSep", "Separator",
-                          choices = c(Comma = ",",
-                                      Semicolon = ";",
-                                      Tab = "\t"),
-                          selected = ","),
+             # Main panel for displaying outputs ----
              
-             # Input: Select quotes ----
-             radioButtons("dataQuote", "Quote",
-                          choices = c(None = "",
-                                      "Double Quote" = '"',
-                                      "Single Quote" = "'"),
-                          selected = '"'),
-             
-             # Horizontal line ----
-             tags$hr(),
-             
-             # Input: Select number of rows to display ----
-             radioButtons("dataDisp", "Display",
-                          choices = c(Head = "head",
-                                      All = "all"),
-                          selected = "head")
-    ),
-    menuItem("EDA", tabName = "eda_tab", icon = icon("dashboard")),
-    menuItem("Machine Learning", icon = icon("th"), tabName = "ml_tab",
-             badgeLabel = "new", badgeColor = "green")
   )
 )
 
-body <- dashboardBody(
-  tabItems(
-    tabItem(tabName = "eda_tab",
-            tabsetPanel(
-              tabPanel("Univariate",
-                       tableOutput("contents")), 
-              tabPanel("Bivariate",
-                       h2("Bivariate content")), 
-            ),
-    ),
-    
-    tabItem(tabName = "ml_tab",
-            tabsetPanel(
-              tabPanel("Feature Engineering",
-                       h2("Feature Engineering things")), 
-              tabPanel("Machine Learning model",
-                       h2("Machine Learning tab content")), 
-            ),
-    )
-  )
-)
-
-# Put them together into a dashboardPage
-dashboardPage(
-  dashboardHeader(title = "Simple tabs"),
-  sidebar,
-  body
-)
-
-# Put them together into a dashboardPage
-ui <- dashboardPage(
-  dashboardHeader(title = "RDashboard"),
-  sidebar,
-  body
-)
-
-server <- function(input, output) { 
+# Define server logic to read selected file ----
+server <- function(input, output) {
   dataset <- reactive({
     # input$file1 will be NULL initially. After the user selects
     # and uploads a file, head of that data file by default,
@@ -111,11 +95,18 @@ server <- function(input, output) {
     }
   })
   
+  
   output$contents <- renderTable({
+    
+    # input$file1 will be NULL initially. After the user selects
+    # and uploads a file, head of that data file by default,
+    # or all rows if selected, will be shown.
     
     dataset()
     
   })
+  
 }
 
+# Create Shiny app ----
 shinyApp(ui, server)
