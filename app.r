@@ -47,7 +47,10 @@ sidebar_data <- conditionalPanel(condition="input.data_panels == 'View'",
 )
 
 sidebar_viz <- conditionalPanel(condition="input.data_panels == 'Visualizations'",
-                                checkboxInput("dataHeader", "Header", TRUE),)
+                                selectInput("viz_group", "General Type", choices = c("Univariate", "Bivariate")),
+                                selectInput("viz_type", "Viz Type", choices = ""),
+                                selectInput("viz_target", "Columns", choices = "")
+                                )
 
 
 # Define UI for data upload app ----
@@ -85,7 +88,7 @@ ui <- fluidPage(
 )
 
 # Define server logic to read selected file ----
-server <- function(input, output) {
+server <- function(session, input, output) {
   dataset <- reactive({
     # input$file1 will be NULL initially. After the user selects
     # and uploads a file, head of that data file by default,
@@ -113,16 +116,29 @@ server <- function(input, output) {
     }
   })
   
+  observeEvent(
+    input$viz_group,
+    updateSelectInput(session, "viz_type", "Viz Type", 
+                      choices = {
+                        viz_uni_choices <- c("hello", "bye")
+                        viz_bivar_choices <- c("test")
+                        
+                        if (input$viz_group == 'Univariate') {
+                          viz_uni_choices
+                        }else {
+                          viz_bivar_choices
+                        }
+                      })
+  )
+  
   
   output$contents <- renderTable({
-    
-    # input$file1 will be NULL initially. After the user selects
-    # and uploads a file, head of that data file by default,
-    # or all rows if selected, will be shown.
-    
+  
     dataset()
     
   })
+  
+ 
   
   # output$summary_table <- renderPlot({
   #   summarytools::dfSummary(dataset())
