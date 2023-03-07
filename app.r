@@ -46,11 +46,22 @@ sidebar_data <- conditionalPanel(condition="input.data_panels == 'View'",
                         
 )
 
-sidebar_viz <- conditionalPanel(condition="input.data_panels == 'Visualizations'",
-                                selectInput("viz_group", "General Type", choices = c("Univariate", "Bivariate")),
-                                selectInput("viz_type", "Viz Type", choices = ""),
-                                selectizeInput("viz_target", "Columns", choices = "", multiple = TRUE)
-                                )
+sidebar_data_univar_density <- conditionalPanel(
+  condition = "input.viz_type == 'Density'",
+  selectInput("viz_type", "Viz Type", choices = ""),
+  
+)
+
+sidebar_viz <- conditionalPanel(
+  condition="input.data_panels == 'Visualizations'",
+  selectInput("viz_group", "General Type", choices = c("Univariate", "Bivariate")),
+  selectInput("viz_type", "Viz Type", choices = ""),
+  selectizeInput("viz_target", "Columns", choices = "", multiple = TRUE),
+  sidebar_data_univar_density
+  )
+
+
+
 
 
 # Define UI for data upload app ----
@@ -120,11 +131,11 @@ server <- function(session, input, output) {
     input$viz_group,
     updateSelectInput(session, "viz_type", "Viz Type", 
                       choices = {
-                        viz_uni_choices <- c("hello", "bye")
-                        viz_bivar_choices <- c("test")
+                        viz_univar_choices <- c("Distribution", "Density", "Boxplot")
+                        viz_bivar_choices <- c("Scatter", "Boxplot", "Correlation")
                         
                         if (input$viz_group == 'Univariate') {
-                          viz_uni_choices
+                          viz_univar_choices
                         }else {
                           viz_bivar_choices
                         }
