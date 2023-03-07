@@ -1,54 +1,72 @@
 library(shiny)
+# library(summarytools)
+
+data_page <- tabsetPanel(type = "tabs",
+                         tabPanel("View", tableOutput("contents")),
+                         tabPanel("Summary", verbatimTextOutput("summary")),
+                         tabPanel("Visualizations"),
+                         id = "conditionedPanels"
+)
+
+sidebar_data <- conditionalPanel(condition="input.conditionedPanels == 'View'",       
+                                 fileInput("dataFile", "Choose CSV File",
+                                           multiple = FALSE,
+                                           accept = c("text/csv",
+                                                      "text/comma-separated-values,text/plain",
+                                                      ".csv")),
+                                 
+                                 # Horizontal line ----
+                                 tags$hr(),
+                                 
+                                 # Input: Checkbox if file has header ----
+                                 checkboxInput("dataHeader", "Header", TRUE),
+                                 
+                                 # Input: Select separator ----
+                                 radioButtons("dataSep", "Separator",
+                                              choices = c(Comma = ",",
+                                                          Semicolon = ";",
+                                                          Tab = "\t"),
+                                              selected = ","),
+                                 
+                                 # Input: Select quotes ----
+                                 radioButtons("dataQuote", "Quote",
+                                              choices = c(None = "",
+                                                          "Double Quote" = '"',
+                                                          "Single Quote" = "'"),
+                                              selected = '"'),
+                                 
+                                 # Horizontal line ----
+                                 tags$hr(),
+                                 
+                                 # Input: Select number of rows to display ----
+                                 radioButtons("dataDisp", "Display",
+                                              choices = c(Head = "head",
+                                                          All = "all"),
+                                              selected = "head")
+                        
+)
+
+sidebar_viz <- conditionalPanel(condition="input.conditionedPanels == 'Visualizations'",
+                                checkboxInput("dataHeader", "Header", TRUE),)
+
 
 # Define UI for data upload app ----
 ui <- fluidPage(
-  navbarPage("Navbar!",
+  navbarPage("RDashboard",
              tabPanel("Data",
                       sidebarLayout(
                         
                         # Sidebar panel for inputs ----
                         sidebarPanel(
-                          
+                          sidebar_data,
+                          sidebar_viz
                           # Input: Select a file ----
-                          fileInput("dataFile", "Choose CSV File",
-                                    multiple = FALSE,
-                                    accept = c("text/csv",
-                                               "text/comma-separated-values,text/plain",
-                                               ".csv")),
-                          
-                          # Horizontal line ----
-                          tags$hr(),
-                          
-                          # Input: Checkbox if file has header ----
-                          checkboxInput("dataHeader", "Header", TRUE),
-                          
-                          # Input: Select separator ----
-                          radioButtons("dataSep", "Separator",
-                                       choices = c(Comma = ",",
-                                                   Semicolon = ";",
-                                                   Tab = "\t"),
-                                       selected = ","),
-                          
-                          # Input: Select quotes ----
-                          radioButtons("dataQuote", "Quote",
-                                       choices = c(None = "",
-                                                   "Double Quote" = '"',
-                                                   "Single Quote" = "'"),
-                                       selected = '"'),
-                          
-                          # Horizontal line ----
-                          tags$hr(),
-                          
-                          # Input: Select number of rows to display ----
-                          radioButtons("dataDisp", "Display",
-                                       choices = c(Head = "head",
-                                                   All = "all"),
-                                       selected = "head")
-                          
+                         
                         ),
                         mainPanel(
                           # Output: Data file ----
-                          tableOutput("contents")
+                          data_page
+                          
                           
                         )
                       ),
@@ -106,7 +124,12 @@ server <- function(input, output) {
     
   })
   
+  # output$summary_table <- renderPlot({
+  #   summarytools::dfSummary(dataset())
+  # })
+  
 }
+
 
 # Create Shiny app ----
 shinyApp(ui, server)
