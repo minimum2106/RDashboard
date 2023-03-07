@@ -49,7 +49,7 @@ sidebar_data <- conditionalPanel(condition="input.data_panels == 'View'",
 sidebar_viz <- conditionalPanel(condition="input.data_panels == 'Visualizations'",
                                 selectInput("viz_group", "General Type", choices = c("Univariate", "Bivariate")),
                                 selectInput("viz_type", "Viz Type", choices = ""),
-                                selectInput("viz_target", "Columns", choices = "")
+                                selectizeInput("viz_target", "Columns", choices = "", multiple = TRUE)
                                 )
 
 
@@ -130,6 +130,25 @@ server <- function(session, input, output) {
                         }
                       })
   )
+  
+  
+  observe({
+    if(input$viz_group == "Univariate"){
+      updateSelectizeInput(session,
+                           inputId = "viz_target",
+                           choices = colnames(dataset()),
+                           selected = NULL,
+                           options = list(maxItems = 1))
+    }
+    else if(input$viz_group == "Bivariate"){
+      updateSelectizeInput(session,
+                           inputId = "viz_target",
+                           choices = colnames(dataset()),
+                           selected = NULL,
+                           options = list(maxItems = ncol(dataset())))
+    }
+  })
+  
   
   
   output$contents <- renderTable({
