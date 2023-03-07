@@ -5,49 +5,60 @@ library(stringr)
 #shinyalert
 # library(summarytools)
 
-data_page <- tabsetPanel(type = "tabs",
-                         tabPanel("View", tableOutput("contents")),
-                         tabPanel("Summary", verbatimTextOutput("summary")),
-                         tabPanel("Visualizations"),
-                         id = "data_panels"
+data_page <- tabsetPanel(
+  type = "tabs",
+  tabPanel("View", tableOutput("contents")),
+  tabPanel("Summary", verbatimTextOutput("summary")),
+  tabPanel("Visualizations"),
+  id = "data_panels"
 )
+
 
 sidebar_data <- conditionalPanel(
   condition="input.data_panels == 'View'",       
-   fileInput("data_file", "Choose CSV File",
-           multiple = FALSE,
-           accept = c("text/csv",
-                      "text/comma-separated-values,text/plain",
-                      ".csv")),
+  fileInput(
+    "data_file", "Choose CSV File",
+    multiple = FALSE,
+    accept = c("text/csv",
+                "text/comma-separated-values,text/plain",
+                ".csv"
+               )
+    ),
  
-                                 # Horizontal line ----
-                                 tags$hr(),
-                                 
-                                 # Input: Checkbox if file has header ----
-                                 checkboxInput("data_header", "Header", TRUE),
-                                 
-                                 # Input: Select separator ----
-                                 radioButtons("data_sep", "Separator",
-                                              choices = c(Comma = ",",
-                                                          Semicolon = ";",
-                                                          Tab = "\t"),
-                                              selected = ","),
+    
+    tags$hr(),
+    checkboxInput("data_header", "Header", TRUE),
+    radioButtons(
+      "data_sep", "Separator",
+      choices = c(
+        Comma = ",", 
+        Semicolon = ";",
+        Tab = "\t"
+      ),
+      selected = ","
+    ),
                                  
                                  # Input: Select quotes ----
-                                 radioButtons("data_quote", "Quote",
-                                              choices = c(None = "",
-                                                          "Double Quote" = '"',
-                                                          "Single Quote" = "'"),
-                                              selected = '"'),
-                                 
-                                 # Horizontal line ----
-                                 tags$hr(),
-                                 
-                                 # Input: Select number of rows to display ----
-                                 radioButtons("data_disp", "Display",
-                                              choices = c(Head = "head",
-                                                          All = "all"),
-                                              selected = "head")
+    radioButtons(
+      "data_quote", "Quote",
+      choices = c(
+        None = "",
+        "Double Quote" = '"',
+        "Single Quote" = "'"),
+      selected = '"'),
+   
+   # Horizontal line ----
+   tags$hr(),
+   
+   # Input: Select number of rows to display ----
+   radioButtons(
+     "data_disp", "Display",
+      choices = c(
+        Head = "head",
+        All = "all"
+      ),
+      selected = "head"
+  )
                         
 )
 
@@ -63,8 +74,7 @@ sidebar_viz <- conditionalPanel(
   selectInput("viz_type", "Viz Type", choices = ""),
   selectizeInput("viz_target", "Columns", choices = "", multiple = TRUE),
   sidebar_data_univar_density
-  )
-
+)
 
 
 sidebar_fe <- sidebarPanel(
@@ -84,35 +94,35 @@ sidebar_fe <- sidebarPanel(
   
 )
 
+data_tab <-  sidebarLayout(
+  sidebarPanel(
+    sidebar_data,
+    sidebar_viz
+  ),
+  mainPanel(data_page)
+)
+
+fe_tab <- sidebarLayout(sidebar_fe, mainPanel(h3("hello")))
+
 # Define UI for data upload app ----
 ui <- fluidPage(
-  navbarPage("RDashboard",
-             tabPanel("Data",
-                      sidebarLayout(
-                        sidebarPanel(
-                          sidebar_data,
-                          sidebar_viz
-                        ),
-                        mainPanel(data_page)
-                      ),
-                      
-             ),
-             tabPanel("Feature Engineering",
-                      sidebarLayout(sidebar_fe, mainPanel(h3("hello")))),
-             
-             navbarMenu("Machine Learning",
-                        "Supervised Learning",
-                        tabPanel("Logistic Regression", 
-                                 h3("test")),
-                        tabPanel("Linear Regression"),
-                        "----",
-                        "Unsupervised Learning",
-                        tabPanel("K-Means Clustering"),
-                        tabPanel("DBScans"),
-                        tabPanel("Hierarchical Clustering Analysis (HCA)")
-                        
-             )
-             
+  navbarPage(
+    "RDashboard",
+     tabPanel( "Data", data_tab),
+     tabPanel("Feature Engineering", fe_tab),
+     navbarMenu("Machine Learning",
+                "Supervised Learning",
+                tabPanel("Logistic Regression", 
+                         h3("test")),
+                tabPanel("Linear Regression"),
+                "----",
+                "Unsupervised Learning",
+                tabPanel("K-Means Clustering"),
+                tabPanel("DBScans"),
+                tabPanel("Hierarchical Clustering Analysis (HCA)")
+                
+     )
+     
   )
 )
 
@@ -149,43 +159,44 @@ server <- function(session, input, output) {
   
   observeEvent(
     input$viz_group,
-    updateSelectInput(session, "viz_type", "Viz Type", 
-                      choices = {
-                        viz_univar_choices <- c("Distribution", "Density", "Boxplot")
-                        viz_bivar_choices <- c("Scatter", "Boxplot", "Correlation")
-                        
-                        if (input$viz_group == 'Univariate') {
-                          viz_univar_choices
-                        }else {
-                          viz_bivar_choices
-                        }
-                      })
+    updateSelectInput(
+      session, "viz_type", "Viz Type", 
+      choices = {
+        viz_univar_choices <- c("Distribution", "Density", "Boxplot")
+        viz_bivar_choices <- c("Scatter", "Boxplot", "Correlation")
+        
+        if (input$viz_group == 'Univariate') {
+          viz_univar_choices
+        }else {
+          viz_bivar_choices
+        }
+      })
   )
   
   
   observe({
     if(input$viz_group == "Univariate"){
-      updateSelectizeInput(session,
-                           inputId = "viz_target",
-                           choices = colnames(dataset()),
-                           selected = NULL,
-                           options = list(maxItems = 1))
+      updateSelectizeInput(
+        session, inputId = "viz_target",
+        choices = colnames(dataset()),
+        selected = NULL,
+        options = list(maxItems = 1))
     }
-    else if(input$viz_group == "Bivariate"){
-      updateSelectizeInput(session,
-                           inputId = "viz_target",
-                           choices = colnames(dataset()),
-                           selected = NULL,
-                           options = list(maxItems = ncol(dataset())))
+    
+    if(input$viz_group == "Bivariate"){
+      updateSelectizeInput(
+        session,
+        inputId = "viz_target",
+        choices = colnames(dataset()),
+        selected = NULL,
+        options = list(maxItems = ncol(dataset())))
     }
   })
   
   
   
   output$contents <- renderTable({
-    
     dataset()
-    
   })
   
   # output$summary_table <- renderPlot({
@@ -229,8 +240,6 @@ server <- function(session, input, output) {
     print(dataset_config$transformations[[1]]$hello)
     
   }
-  
-  
   
   observeEvent(
     input$fe_transform,{
