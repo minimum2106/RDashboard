@@ -9,7 +9,7 @@ data_page <- tabsetPanel(type = "tabs",
 )
 
 sidebar_data <- conditionalPanel(condition="input.data_panels == 'View'",       
-                                 fileInput("dataFile", "Choose CSV File",
+                                 fileInput("data_file", "Choose CSV File",
                                            multiple = FALSE,
                                            accept = c("text/csv",
                                                       "text/comma-separated-values,text/plain",
@@ -19,17 +19,17 @@ sidebar_data <- conditionalPanel(condition="input.data_panels == 'View'",
                                  tags$hr(),
                                  
                                  # Input: Checkbox if file has header ----
-                                 checkboxInput("dataHeader", "Header", TRUE),
+                                 checkboxInput("data_header", "Header", TRUE),
                                  
                                  # Input: Select separator ----
-                                 radioButtons("dataSep", "Separator",
+                                 radioButtons("data_sep", "Separator",
                                               choices = c(Comma = ",",
                                                           Semicolon = ";",
                                                           Tab = "\t"),
                                               selected = ","),
                                  
                                  # Input: Select quotes ----
-                                 radioButtons("dataQuote", "Quote",
+                                 radioButtons("data_quote", "Quote",
                                               choices = c(None = "",
                                                           "Double Quote" = '"',
                                                           "Single Quote" = "'"),
@@ -39,7 +39,7 @@ sidebar_data <- conditionalPanel(condition="input.data_panels == 'View'",
                                  tags$hr(),
                                  
                                  # Input: Select number of rows to display ----
-                                 radioButtons("dataDisp", "Display",
+                                 radioButtons("data_disp", "Display",
                                               choices = c(Head = "head",
                                                           All = "all"),
                                               selected = "head")
@@ -90,14 +90,14 @@ server <- function(input, output) {
     # input$file1 will be NULL initially. After the user selects
     # and uploads a file, head of that data file by default,
     # or all rows if selected, will be shown.
-    req(input$dataFile)
+    req(input$data_file)
     
     tryCatch(
       {
-        df <- read.csv(input$dataFile$datapath,
-                       header = input$dataHeader,
-                       sep = input$dataSep,
-                       quote = input$dataQuote)
+        df <- read.csv(input$data_file$datapath,
+                       header = input$data_header,
+                       sep = input$data_sep,
+                       quote = input$data_quote)
       },
       error = function(e) {
         # return a safeError if a parsing error occurs
@@ -105,7 +105,7 @@ server <- function(input, output) {
       }
     )
     
-    if(input$dataDisp == "head") {
+    if(input$data_disp == "head") {
       return(head(df))
     }
     else {
