@@ -1,4 +1,8 @@
 library(shiny)
+library(shinyalert)
+library(stringr)
+
+#shinyalert
 # library(summarytools)
 
 data_page <- tabsetPanel(type = "tabs",
@@ -8,13 +12,14 @@ data_page <- tabsetPanel(type = "tabs",
                          id = "data_panels"
 )
 
-sidebar_data <- conditionalPanel(condition="input.data_panels == 'View'",       
-                                 fileInput("data_file", "Choose CSV File",
-                                           multiple = FALSE,
-                                           accept = c("text/csv",
-                                                      "text/comma-separated-values,text/plain",
-                                                      ".csv")),
-                                 
+sidebar_data <- conditionalPanel(
+  condition="input.data_panels == 'View'",       
+   fileInput("data_file", "Choose CSV File",
+           multiple = FALSE,
+           accept = c("text/csv",
+                      "text/comma-separated-values,text/plain",
+                      ".csv")),
+ 
                                  # Horizontal line ----
                                  tags$hr(),
                                  
@@ -62,48 +67,58 @@ sidebar_viz <- conditionalPanel(
 
 
 
-
+sidebar_fe <- sidebarPanel(
+  selectInput(
+    "fe_dataset",
+    "Choose Dataset",
+    choices = ""
+  ),
+  actionButton("fe_add_dataset", "Add this dataset"),
+  tags$hr(),
+  selectInput(
+    "fe_options", 
+    "Transformation", 
+    choices = c("Filter", "Normalize/Standardize", "Encoding", "Delete")
+  ),
+  actionButton("fe_transform", "Transform"),
+  
+)
 
 # Define UI for data upload app ----
 ui <- fluidPage(
   navbarPage("RDashboard",
              tabPanel("Data",
                       sidebarLayout(
-                        
-                        # Sidebar panel for inputs ----
                         sidebarPanel(
                           sidebar_data,
                           sidebar_viz
-                          # Input: Select a file ----
-                         
                         ),
-                        mainPanel(
-                          # Output: Data file ----
-                          data_page
-                          
-                          
-                        )
+                        mainPanel(data_page)
                       ),
                       
              ),
-             tabPanel("Machine Learning",
-                      h2("hello"))
+             tabPanel("Feature Engineering",
+                      sidebarLayout(sidebar_fe, mainPanel(h3("hello")))),
              
-             # App title ----
-             
-             # Sidebar layout with input and output definitions ----
-             
-             # Main panel for displaying outputs ----
+             navbarMenu("Machine Learning",
+                        "Supervised Learning",
+                        tabPanel("Logistic Regression", 
+                                 h3("test")),
+                        tabPanel("Linear Regression"),
+                        "----",
+                        "Unsupervised Learning",
+                        tabPanel("K-Means Clustering"),
+                        tabPanel("DBScans"),
+                        tabPanel("Hierarchical Clustering Analysis (HCA)")
+                        
+             )
              
   )
 )
 
-# Define server logic to read selected file ----
+
 server <- function(session, input, output) {
   dataset <- reactive({
-    # input$file1 will be NULL initially. After the user selects
-    # and uploads a file, head of that data file by default,
-    # or all rows if selected, will be shown.
     req(input$data_file)
     
     tryCatch(
@@ -114,7 +129,6 @@ server <- function(session, input, output) {
                        quote = input$data_quote)
       },
       error = function(e) {
-        # return a safeError if a parsing error occurs
         stop(safeError(e))
       }
     )
@@ -126,6 +140,12 @@ server <- function(session, input, output) {
       return(df)
     }
   })
+  
+  chosen_dataset <- reactive({
+    
+  })
+  
+  
   
   observeEvent(
     input$viz_group,
@@ -163,16 +183,63 @@ server <- function(session, input, output) {
   
   
   output$contents <- renderTable({
-  
+    
     dataset()
     
   })
   
- 
-  
   # output$summary_table <- renderPlot({
   #   summarytools::dfSummary(dataset())
   # })
+  
+  dataset_config <- reactiveValues(
+    names = c("Original"),
+    transformations = list()
+  )
+  
+  dataset_test <- reactiveValues()
+  
+  
+  observeEvent(
+    input$data_file,
+    updateSelectInput(
+      session, "fe_dataset", "Choose Dataset",
+      choices = dataset_config$names)
+  )
+
+  observeEvent(
+    input$fe_add_dataset,
+    shinyalert('hello', type='input', callbackR = callback_add_dataset)
+  )
+  
+  temporary_transformation <- reactiveValues()
+
+  callback_add_dataset <- function(value) {
+    trimmed_value <- str_trim(value, side="both")
+    
+    dataset_config$names <- append(dataset_config$names, c(trimmed_value))
+    dataset_config$transformations[[gsub(" ", "_", trimmed_value)]] <- list(
+      "hello" = "hi"
+    )
+    
+    updateSelectInput(
+      session, "fe_dataset", "Choose Dataset",
+      choices = dataset_config$names)
+    
+    print(dataset_config$transformations[[1]]$hello)
+    
+  }
+  
+  
+  
+  observeEvent(
+    input$fe_transform,{
+      temporary_transformation[[]] <- {
+        
+      }
+    }
+    
+  )
   
 }
 
