@@ -5,10 +5,10 @@ data_page <- tabsetPanel(type = "tabs",
                          tabPanel("View", tableOutput("contents")),
                          tabPanel("Summary", verbatimTextOutput("summary")),
                          tabPanel("Visualizations"),
-                         id = "conditionedPanels"
+                         id = "data_panels"
 )
 
-sidebar_data <- conditionalPanel(condition="input.conditionedPanels == 'View'",       
+sidebar_data <- conditionalPanel(condition="input.data_panels == 'View'",       
                                  fileInput("dataFile", "Choose CSV File",
                                            multiple = FALSE,
                                            accept = c("text/csv",
@@ -46,7 +46,7 @@ sidebar_data <- conditionalPanel(condition="input.conditionedPanels == 'View'",
                         
 )
 
-sidebar_viz <- conditionalPanel(condition="input.conditionedPanels == 'Visualizations'",
+sidebar_viz <- conditionalPanel(condition="input.data_panels == 'Visualizations'",
                                 checkboxInput("dataHeader", "Header", TRUE),)
 
 
