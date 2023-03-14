@@ -16,6 +16,18 @@ standardize <- function(x, na.rm = TRUE) {
   }
 }
 
-normalize <- function(x, y) {
-  if (is.numeric(x) && is.numeric(y)) x / y else x
+normalize <- function(x, x_min, x_max) {
+  if (is.numeric(x)) (x - x_min) / (x_max - x_min) else x
+}
+
+log_transform <- function(x) {
+  if (is.numeric(x)) log(x) else x
+}
+
+exponential <- function(x) {
+  if ( is.numeric(x)) exp(x) else x
+}
+
+match_or_not <- function(x, y) {
+  match(x, y, 0)
 }

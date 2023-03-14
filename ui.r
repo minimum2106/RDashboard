@@ -4,7 +4,9 @@ library(summarytools)
 
 source("data_tab.r", local = TRUE)
 source("fe_tab.r", local = TRUE)
-source("ml_tab.r", local = TRUE)
+
+# MACHINE LEARNING TABS
+source("ml_ols_tab.r", local = TRUE)
 
 
 ui <- fluidPage(
@@ -14,8 +16,7 @@ ui <- fluidPage(
     tabPanel("Feature Engineering", fe_tab),
     navbarMenu("Machine Learning",
                "Supervised Learning",
-               tabPanel("Logistic Regression", 
-                        h3("test")),
+               tabPanel("Logistic Regression"),
                tabPanel("Linear Regression"),
                "----",
                "Unsupervised Learning",

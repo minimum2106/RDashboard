@@ -35,6 +35,21 @@ sidebar_fe_encoding <- conditionalPanel(
   )
 )
 
+sidebar_fe_mv_cat_customize <- conditionalPanel(
+  condition = "input.fe_mutate_mv == 'Customize'",
+  textInput(
+    'fe_mutate_mv_customize', "Value Names", 
+    placeholder = 'Enter the value that you want to replace missing value with')
+)
+
+sidebar_fe_mv <- conditionalPanel(
+  condition = "input.fe_options == 'Handle Missing Values'",
+  selectInput(
+    "fe_mutate_mv", "Methods",
+    choices = ""
+  ),
+  sidebar_fe_mv_cat_customize
+)
 # based sidebar for Feature Engineering page
 sidebar_fe <- sidebarPanel(
   
@@ -48,7 +63,7 @@ sidebar_fe <- sidebarPanel(
   selectInput(
     "fe_options", 
     "Transformation", 
-    choices = c("Filter", "Mutate", "Encoding", "Rename")
+    choices = c("Filter", "Mutate", "Encoding", "Rename", "Handle Missing Values")
   ),
   selectInput(
     "fe_columns", 
@@ -61,6 +76,7 @@ sidebar_fe <- sidebarPanel(
   sidebar_fe_mutate,
   sidebar_fe_encoding,
   sidebar_fe_rename,
+  sidebar_fe_mv,
   
   # launch the transformation
   actionButton("fe_transform", "Transform")
@@ -68,6 +84,8 @@ sidebar_fe <- sidebarPanel(
 )
 
 
-fe_tab <- sidebarLayout(sidebar_fe, mainPanel(
-  tableOutput("fe_datatable")
+fe_tab <- sidebarLayout(
+  sidebar_fe, 
+  mainPanel(
+    tableOutput("fe_datatable")
 ))

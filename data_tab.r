@@ -1,3 +1,5 @@
+library(DT)
+
 sidebar_data <- conditionalPanel(
   condition="input.data_panels == 'View'",       
   fileInput(
@@ -7,6 +9,12 @@ sidebar_data <- conditionalPanel(
                "text/comma-separated-values,text/plain",
                ".csv"
     )
+  ),
+  
+  selectInput(
+    "view_dataset",
+    "Choose Dataset",
+    choices = ""
   ),
   
   tags$hr(),
@@ -44,31 +52,56 @@ sidebar_data <- conditionalPanel(
   )
 )
 
+sidebar_summary <- conditionalPanel(
+  condition = "input.data_panels == 'Summary'",
+  selectInput(
+    "summary_dataset",
+    "Choose Dataset",
+    choices = ""
+  ),
+)
+
 sidebar_data_univar_density <- conditionalPanel(
   condition = "input.viz_type == 'Density'",
-  selectInput("viz_type", "Viz Type", choices = "")
+  
+)
+
+sidebar_data_univar_dist <- conditionalPanel(
+  condition = "input.viz_type == 'Distribution'",
 )
 
 sidebar_viz <- conditionalPanel(
   condition="input.data_panels == 'Visualizations'",
+  
+  selectInput(
+    "viz_dataset",
+    "Choose Dataset",
+    choices = ""
+  ),
+  
   selectInput("viz_group", "General Type", choices = c("Univariate", "Bivariate")),
   selectInput("viz_type", "Viz Type", choices = ""),
   selectizeInput("viz_target", "Columns", choices = "", multiple = TRUE),
-  sidebar_data_univar_density
+  
+  sidebar_data_univar_dist,
+  sidebar_data_univar_density,
+  
+  actionButton("viz_generate", "Generate Visualization", width = "100%"),
 )
 
 
 data_content <- tabsetPanel(
   type = "tabs",
-  tabPanel("View", tableOutput("contents")),
+  tabPanel("View", DT::dataTableOutput("contents")),
   tabPanel("Summary", verbatimTextOutput("summary")),
-  tabPanel("Visualizations"),
+  tabPanel("Visualizations", plotOutput("data_viz")),
   id = "data_panels"
 )
 
 data_tab <-  sidebarLayout(
   sidebarPanel(
     sidebar_data,
+    sidebar_summary,
     sidebar_viz
   ),
   mainPanel(data_content)

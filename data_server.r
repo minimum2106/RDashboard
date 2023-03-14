@@ -1,13 +1,21 @@
   library(shiny)
+  library(shinyalert)
+  library(tidyverse)
+  library(stringr)
+  
+  library(DT)
+  library(ggplot2)
+  
+  source("global_var.r", local = TRUE)
   
   observeEvent(
     input$viz_group,
     updateSelectInput(
-      session, "viz_type", "Viz Type", 
+      session, "viz_type", "Viz Type",
       choices = {
         viz_univar_choices <- c("Distribution", "Density", "Boxplot")
         viz_bivar_choices <- c("Scatter", "Boxplot", "Correlation")
-        
+
         if (input$viz_group == 'Univariate') {
           viz_univar_choices
         }else {
@@ -15,7 +23,7 @@
         }
       })
   )
-  
+
   observeEvent(
     input$data_file,
     updateSelectInput(
@@ -32,7 +40,7 @@
         selected = NULL,
         options = list(maxItems = 1))
     }
-    
+
     if(input$viz_group == "Bivariate"){
       updateSelectizeInput(
         session,
@@ -43,15 +51,31 @@
     }
   })
   
-  output$contents <- renderTable({
+  output$contents <- DT::renderDataTable({
     if(input$data_disp == "head") {
       return(head(original_dataset()))
     }
     
     return(original_dataset())
-  })
+  },
   
-  # output$summary_table <- renderPlot({
-  #   summarytools::dfSummary(dataset())
-  # })
+  options = list(
+    autoWidth = TRUE,
+    columnDefs = list(list(width = '200px', targets = c(1, 3)))
+    )
   
+  )
+  
+  
+  observeEvent(
+    input$viz_generate,
+    {
+      if (input$viz_type == "Distribution") {
+        print(input$viz_target)
+        output$data_viz <- renderPlot({
+          ggplot(data=temporary_dataset$data, aes_string(input$viz_target)) +
+            geom_histogram(binwidth=.5, colour="black", fill="white")
+        })
+      }
+    }
+  )
