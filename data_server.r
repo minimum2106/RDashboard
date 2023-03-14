@@ -8,6 +8,18 @@
   
   source("global_var.r", local = TRUE)
   
+  output$summary <- renderPrint({
+    req(input$data_file)
+    
+    non_numeric <- function(x) !is.numeric(x)
+    
+    non_numeric_data <- temporary_dataset$data %>%
+      select(where(non_numeric))
+    
+    numeric_data <- temporary_dataset$data %>%
+      select(where(is.numeric))
+  })
+  
   observeEvent(
     input$viz_group,
     updateSelectInput(

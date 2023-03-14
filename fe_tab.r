@@ -58,7 +58,12 @@ sidebar_fe <- sidebarPanel(
     "Choose Dataset",
     choices = ""
   ),
-  actionButton("fe_add_dataset", "Add this dataset"),
+  
+  actionButton(
+    "fe_add_dataset", "Add this dataset", width = "100%",
+    style="color: #fff; background-color: #337ab7; border-color: #2e6da4"
+  ),
+  
   tags$hr(),
   selectInput(
     "fe_options", 
@@ -79,8 +84,10 @@ sidebar_fe <- sidebarPanel(
   sidebar_fe_mv,
   
   # launch the transformation
-  actionButton("fe_transform", "Transform")
-  
+  actionButton(
+    "fe_transform", "Transform", width = "100%",
+    style="color: #fff; background-color: #337ab7; border-color: #2e6da4"
+  )
 )
 
 

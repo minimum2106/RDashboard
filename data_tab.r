@@ -86,7 +86,10 @@ sidebar_viz <- conditionalPanel(
   sidebar_data_univar_dist,
   sidebar_data_univar_density,
   
-  actionButton("viz_generate", "Generate Visualization", width = "100%"),
+  actionButton(
+    "viz_generate", "Generate Visualization", width = "100%",
+    style="color: #fff; background-color: #337ab7; border-color: #2e6da4"
+  ),
 )
 
 
