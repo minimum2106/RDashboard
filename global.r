@@ -31,3 +31,5 @@ exponential <- function(x) {
 match_or_not <- function(x, y) {
   match(x, y, 0)
 }
+
+non_numeric <- function(x) !is.numeric(x)

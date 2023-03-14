@@ -70,6 +70,13 @@ sidebar_data_univar_dist <- conditionalPanel(
   condition = "input.viz_type == 'Distribution'",
 )
 
+sidebar_data_scatter <- conditionalPanel(
+  condition = "input.viz_type == 'Scatter'",
+  selectizeInput("viz_color", "Color column:", choices = ""),
+  selectizeInput("viz_size", "Size Column", choices = ""),
+)
+
+
 sidebar_viz <- conditionalPanel(
   condition="input.data_panels == 'Visualizations'",
   
@@ -78,19 +85,28 @@ sidebar_viz <- conditionalPanel(
     "Choose Dataset",
     choices = ""
   ),
-  
-  selectInput("viz_group", "General Type", choices = c("Univariate", "Bivariate")),
-  selectInput("viz_type", "Viz Type", choices = ""),
-  selectizeInput("viz_target", "Columns", choices = "", multiple = TRUE),
+  selectInput(
+    "viz_type", "Viz Type", 
+    choices = c(
+      "Distribution",
+      "Density",
+      "Boxplot",
+      "Scatter",
+      "Density"
+    )),
+  selectizeInput("viz_var_1", "Variable 1:", choices = ""),
+  selectizeInput("viz_var_2", "Variable 2:", choices = ""),
   
   sidebar_data_univar_dist,
   sidebar_data_univar_density,
+  sidebar_data_scatter,
   
   actionButton(
     "viz_generate", "Generate Visualization", width = "100%",
     style="color: #fff; background-color: #337ab7; border-color: #2e6da4"
   ),
 )
+
 
 
 data_content <- tabsetPanel(
