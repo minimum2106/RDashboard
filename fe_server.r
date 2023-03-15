@@ -68,10 +68,8 @@
     input$fe_dataset
     ,
     {
-      
       temp_dataset <- original_dataset()
       temporary_dataset$transformations <- dataset_collection$dataset_config[[convert_name(input$fe_dataset)]]
-      
       
       for (transformation in temporary_dataset$transformations) {
         if (transformation$name == 'Rename') {
@@ -267,7 +265,7 @@
   )})
   
   output$fe_datatable <- DT::renderDataTable({
-    datatable(temporary_dataset$data, options=list(scrollX = T, legthMenu = c(40, 70, 100)))
+    datatable(temporary_dataset$data, options=list(scrollX = T, scrollY = T, lengthMenu = c(15, 25, 35)))
   })
   
   

@@ -62,7 +62,7 @@
   
   output$contents <- DT::renderDataTable({
     if(input$data_disp == "head") {
-      data <- datatable(head(original_dataset()), options = list(scrollX = T))
+      data <- datatable(head(original_dataset()), options = list(scrollX = T, scrollY= T))
     } else {
       data <- datatable(original_dataset(), options = list(scrollX = T))
     }
