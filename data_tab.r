@@ -1,4 +1,5 @@
 library(DT)
+library(summarytools)
 
 sidebar_data <- conditionalPanel(
   condition="input.data_panels == 'View'",       
@@ -112,7 +113,7 @@ sidebar_viz <- conditionalPanel(
 data_content <- tabsetPanel(
   type = "tabs",
   tabPanel("View", DT::dataTableOutput("contents")),
-  tabPanel("Summary", verbatimTextOutput("summary")),
+  tabPanel("Summary", htmlOutput("summary")),
   tabPanel("Visualizations", plotOutput("data_viz")),
   id = "data_panels"
 )

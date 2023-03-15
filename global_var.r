@@ -2,7 +2,7 @@ library(shiny)
 
 source("data_tab.r", local = TRUE)
 
-temporary_dataset <- reactiveValues(data = "", transformations = list())
+temporary_dataset <- reactiveValues(data = data.frame(), transformations = list())
 
 original_dataset <- reactive({
     req(input$data_file)

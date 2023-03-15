@@ -8,17 +8,21 @@
   
   source("global_var.r", local = TRUE)
   
-  output$summary <- renderPrint({
-    req(input$data_file)
-    
-    non_numeric_data <- temporary_dataset$data %>%
-      select(where(non_numeric))
-    
-    numeric_data <- temporary_dataset$data %>%
-      select(where(is.numeric))
-    
-    numeric_data %>% 
-      summarise_all(list(mean, median , max, min))
+  # output$summary <- renderPrint({
+  #   req(input$data_file)
+  #   
+  #   non_numeric_data <- temporary_dataset$data %>%
+  #     select(where(non_numeric))
+  #   
+  #   numeric_data <- temporary_dataset$data %>%
+  #     select(where(is.numeric))
+  #   
+  #   numeric_data %>% 
+  #     summarise_all(list(mean, median , max, min))
+  # })
+  
+  output$summary <- renderUI({
+    summarytools::view(summarytools::dfSummary(temporary_dataset$data, justify = "center"), method = "render")
   })
   
   observeEvent(
