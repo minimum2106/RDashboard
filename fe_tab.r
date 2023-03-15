@@ -99,7 +99,7 @@ sidebar_fe <- sidebarPanel(
   verbatimTextOutput(
     "fe_transformation_log",
   ),
-  tags$head(tags$style("#fe_transformation_log{ overflow-y:scroll; max-height: 500px}"))
+  tags$head(tags$style("#fe_transformation_log{ overflow-y:scroll; max-height: 300px}"))
 )
 
 

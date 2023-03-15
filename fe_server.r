@@ -119,22 +119,22 @@
         if (transformation$name == 'Mutate') {
           if (transformation$method == "Log Transformation") {
             temp_dataset <- temp_dataset %>% 
-              mutate(!!transformation$column := log_transform(temp_datasett[[transformation$column]]))
+              mutate(!!transformation$column := log_transform(temp_dataset[[transformation$column]]))
           }
           
           if (transformation$method == "Standardization") {
             temp_dataset <- temp_dataset %>% 
-              mutate(!!transformation$column := standardize(temp_datasett[[transformation$column]]))
+              mutate(!!transformation$column := standardize(temp_dataset[[transformation$column]]))
           }
           
           if (transformation$method == "Exponential") {
             temp_dataset <- temp_dataset %>% 
-              mutate(!!transformation$column := exponential(temp_datasett[[transformation$column]]))
+              mutate(!!transformation$column := exponential(temp_dataset[[transformation$column]]))
           }
           
           if (transformation$method == "Normalization") {
             temp_dataset <- temp_dataset %>% 
-              mutate(!!transformation$column := normalize(temp_datasett[[transformation$column]]))
+              mutate(!!transformation$column := normalize(temp_dataset[[transformation$column]]))
           }
         }
         
@@ -169,7 +169,7 @@
         
         line_break = "\n"
         
-        trans_break = "================================================"
+        trans_break = "============================================================="
         trans_name_placeholder = "Transformation's name:"
         trans_value_placeholder = "Value:"
         
@@ -186,7 +186,6 @@
           if (transformation$name == "Filter") {
             trans_content <- paste(
               paste(trans_name_placeholder, transformation$name, sep=" "),
-              paste("Column:", transformation$column, sep=" "),
               paste("Condition:", transformation$condition, sep=" "),
               sep = line_break
             )
@@ -260,10 +259,10 @@
             }
           }
           
-          
-          trans_format <- paste(trans_break, trans_content, sep="\n")
+          trans_format <- paste(trans_format, trans_break, trans_content, sep="\n")
         }
         
+        trans_format
       }
   )})
   
