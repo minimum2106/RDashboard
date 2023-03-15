@@ -58,18 +58,13 @@
   
   output$contents <- DT::renderDataTable({
     if(input$data_disp == "head") {
-      return(head(original_dataset()))
+      data <- datatable(head(original_dataset()), options = list(scrollX = T))
+    } else {
+      data <- datatable(original_dataset(), options = list(scrollX = T))
     }
     
-    return(original_dataset())
-  },
-  
-  options = list(
-    autoWidth = TRUE,
-    columnDefs = list(list(width = '200px', targets = c(1, 3)))
-    )
-  
-  )
+    data
+  })
   
   
   observeEvent(

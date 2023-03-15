@@ -1,3 +1,5 @@
+library(DT)
+
 sidebar_fe_filter <- conditionalPanel(
   condition = "input.fe_options == 'Filter'",
   textInput(
@@ -50,6 +52,15 @@ sidebar_fe_mv <- conditionalPanel(
   ),
   sidebar_fe_mv_cat_customize
 )
+
+sidebar_fe_not_filter <- conditionalPanel(
+  condition = "input.fe_options != 'Filter'",
+  selectInput(
+    "fe_columns", 
+    "Columns", 
+    choices = ""
+  ),
+)
 # based sidebar for Feature Engineering page
 sidebar_fe <- sidebarPanel(
   
@@ -70,11 +81,8 @@ sidebar_fe <- sidebarPanel(
     "Transformation", 
     choices = c("Filter", "Mutate", "Encoding", "Rename", "Handle Missing Values")
   ),
-  selectInput(
-    "fe_columns", 
-    "Columns", 
-    choices = ""
-  ),
+  
+  sidebar_fe_not_filter,
   
   # additional sidebars for different mutating scenarios
   sidebar_fe_filter,
@@ -87,12 +95,16 @@ sidebar_fe <- sidebarPanel(
   actionButton(
     "fe_transform", "Transform", width = "100%",
     style="color: #fff; background-color: #337ab7; border-color: #2e6da4"
-  )
+  ),
+  verbatimTextOutput(
+    "fe_transformation_log",
+  ),
+  tags$head(tags$style("#fe_transformation_log{ overflow-y:scroll; max-height: 500px}"))
 )
 
 
 fe_tab <- sidebarLayout(
   sidebar_fe, 
   mainPanel(
-    tableOutput("fe_datatable")
+    DT::dataTableOutput("fe_datatable")
 ))

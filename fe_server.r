@@ -162,9 +162,115 @@
     }
   )
   
-  output$fe_datatable <- renderTable({
-    temporary_dataset$data
+  observeEvent(
+    input$fe_dataset, {
+      output$fe_transformation_log <- renderText({
+        trans_format = ""
+        
+        line_break = "\n"
+        
+        trans_break = "================================================"
+        trans_name_placeholder = "Transformation's name:"
+        trans_value_placeholder = "Value:"
+        
+        for (transformation in temporary_dataset$transformations){
+          if (transformation$name == "Rename") {
+            trans_content <- paste(
+              paste(trans_name_placeholder, transformation$name, sep=" "),
+              paste("Old Name:", transformation$old_name, sep=" "),
+              paste("New Name:", transformation$new_name, sep=" "),
+              sep = line_break
+            )
+          }
+          
+          if (transformation$name == "Filter") {
+            trans_content <- paste(
+              paste(trans_name_placeholder, transformation$name, sep=" "),
+              paste("Column:", transformation$column, sep=" "),
+              paste("Condition:", transformation$condition, sep=" "),
+              sep = line_break
+            )
+          }
+          
+          if (transformation$name == "Encoding") {
+            trans_content <- paste(
+              paste(trans_name_placeholder, transformation$name, sep=" "),
+              paste("Column:", transformation$column, sep=" "),
+              paste("Method:", transformation$method, sep=" "),
+              sep = line_break
+            )
+          }
+          
+          if (transformation$name == "Mutate") {
+            if (transformation$method == "Normalization") {
+              trans_content <- paste(
+                paste(trans_name_placeholder, transformation$name, sep=" "),
+                paste("Column:", transformation$column, sep=" "),
+                paste("Method:", transformation$method, sep=" "),
+                sep = line_break
+              )
+            }
+            
+            if (transformation$method == "Log Transformation") {
+              trans_content <- paste(
+                paste(trans_name_placeholder, transformation$name, sep=" "),
+                paste("Column:", transformation$column, sep=" "),
+                paste("Method:", transformation$method, sep=" "),
+                sep = line_break
+              )
+            }
+            
+            if (transformation$method == "Exponential") {
+              trans_content <- paste(
+                paste(trans_name_placeholder, transformation$name, sep=" "),
+                paste("Column:", transformation$column, sep=" "),
+                paste("Method:", transformation$method, sep=" "),
+                sep = line_break
+              )
+            }
+            
+            if (transformation$method == "Standardization") {
+              trans_content <- paste(
+                paste(trans_name_placeholder, transformation$name, sep=" "),
+                paste("Column:", transformation$column, sep=" "),
+                paste("Method:", transformation$method, sep=" "),
+                sep = line_break
+              )
+            }
+            
+           
+          }
+          
+          if (transformation$name == "Handle Missing Values") {
+            if (transformation$name %in% c("Customize", "Most Frequent Value")) {
+              trans_content <- paste(
+                paste(trans_name_placeholder, transformation$name, sep=" "),
+                paste("Column:", transformation$column, sep=" "),
+                paste("Method:", transformation$method, sep=" "),
+                paste("Value:", transformation$value, sep=" "),
+                sep = line_break
+              )
+            } else {
+              trans_content <- paste(
+                paste(trans_name_placeholder, transformation$name, sep=" "),
+                paste("Column:", transformation$column, sep=" "),
+                paste("Method:", transformation$method, sep=" "),
+                sep = line_break
+              )
+            }
+          }
+          
+          
+          trans_format <- paste(trans_break, trans_content, sep="\n")
+        }
+        
+      }
+  )})
+  
+  output$fe_datatable <- DT::renderDataTable({
+    datatable(temporary_dataset$data, options=list(scrollX = T, legthMenu = c(40, 70, 100)))
   })
+  
   
   observeEvent({
     input$fe_options
