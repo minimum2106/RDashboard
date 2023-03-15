@@ -19,7 +19,7 @@
         session, inputId = "fe_columns",
         choices = colnames(original_dataset()))
       
-      columns <- prepend(colnames(temporary_dataset$data), "")
+      columns <- prepend(colnames(original_dataset()), "")
       
       updateSelectizeInput(
         session, inputId = "viz_var_1",
@@ -44,9 +44,45 @@
         choices = columns,
         selected = NULL,
         options = list(maxItems = 1))
+      
     }
     
   )
+  
+  
+  observe({
+    updateSelectInput(
+      session, inputId = "fe_columns",
+      choices = colnames(temporary_dataset$data))
+    
+    columns <- prepend(colnames(temporary_dataset$data), "")
+    
+    
+    updateSelectizeInput(
+      session, inputId = "viz_var_1",
+      choices = columns,
+      selected = NULL,
+      options = list(maxItems = 1))
+    
+    updateSelectizeInput(
+      session, inputId = "viz_var_2",
+      choices = columns,
+      selected = NULL,
+      options = list(maxItems = 1))
+    
+    updateSelectizeInput(
+      session, inputId = "viz_color",
+      choices = columns,
+      selected = NULL,
+      options = list(maxItems = 1))
+    
+    updateSelectizeInput(
+      session, inputId = "viz_size",
+      choices = columns,
+      selected = NULL,
+      options = list(maxItems = 1))
+  })
+  
   
   output$contents <- DT::renderDataTable({
     if(input$data_disp == "head") {
