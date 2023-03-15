@@ -2,6 +2,15 @@
   library(mltools)
   
   source("global.r", local = TRUE)
+
+  ERROR <- reactiveVal("")
+  observe({
+    if (ERROR() == "") {
+      return()
+    }
+    
+    shinyalert(ERROR(), type="error")
+  })
   
   # observeEvent(
   #   input$data_file, {
@@ -269,13 +278,13 @@
   })
   
   
+  
   observeEvent({
     input$fe_options
     input$fe_columns
     },
     {
       req(input$data_file)
-      
       if (input$fe_options == "Handle Missing Values") {
         updateSelectInput(
           session, "fe_mutate_mv", "Methods",
@@ -314,7 +323,7 @@
             session, "fe_columns",
             choices = colnames(new_dataset)
           )
-        }, error = function(e) {}
+        }, error = function(e) {ERROR("Invalid Name")}
         )
       }
       
@@ -327,10 +336,8 @@
             temporary_dataset$transformations,
             list(list(name = input$fe_options, condition = input$fe_filter_condition))
           )
-        }, error = function(e) {}
-        
+        }, error = function(e) {ERROR("Invalid condition")}
         ) 
-        # temporary_dataset$data <- new_dataset
       }
       
       if (input$fe_options == "Encoding") {
@@ -373,7 +380,7 @@
             choices = colnames(new_dataset)
           )
           
-        }, error = function(e) {print(e)}
+        }, error = function(e) {ERROR("Invalid Encoding Process")}
         )        
       }
       
@@ -427,8 +434,6 @@
               )
               )
             )
-            
-            print("done normalizing")
           }
           
           if (input$fe_mutate_options == "Exponential") {
@@ -447,9 +452,7 @@
             
             print("done exponential")
           }
-        }, error = function(e) {
-          print(e)
-        })
+        }, error = function(e) {ERROR("Unsuccessful Mutation")})
         
       
       }
@@ -537,7 +540,7 @@
             )
             
           }
-        }, error = function(e) {print(e)}
+        }, error = function(e) {ERROR("Invalid Condition")}
         )
       }
     
