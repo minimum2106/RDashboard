@@ -1,5 +1,7 @@
 library(DT)
 
+source("ui_common.r", local = TRUE)
+
 sidebar_fe_filter <- conditionalPanel(
   condition = "input.fe_options == 'Filter'",
   textInput(
@@ -80,8 +82,8 @@ sidebar_fe <- sidebarPanel(
     "fe_options", 
     "Transformation", 
     choices = c("Filter", "Mutate", "Encoding", "Rename", "Handle Missing Values")
-  ),
-  
+  )
+  , 
   sidebar_fe_not_filter,
   
   # additional sidebars for different mutating scenarios

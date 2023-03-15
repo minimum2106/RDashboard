@@ -1,6 +1,8 @@
 library(DT)
 library(summarytools)
 
+source("ui_common.r", local = TRUE)
+
 sidebar_data <- conditionalPanel(
   condition="input.data_panels == 'View'",       
   fileInput(
@@ -80,12 +82,12 @@ sidebar_data_scatter <- conditionalPanel(
 
 sidebar_viz <- conditionalPanel(
   condition="input.data_panels == 'Visualizations'",
-  
   selectInput(
     "viz_dataset",
     "Choose Dataset",
     choices = ""
   ),
+  
   selectInput(
     "viz_type", "Viz Type", 
     choices = c(

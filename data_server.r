@@ -8,18 +8,6 @@
   
   source("global_var.r", local = TRUE)
   
-  # output$summary <- renderPrint({
-  #   req(input$data_file)
-  #   
-  #   non_numeric_data <- temporary_dataset$data %>%
-  #     select(where(non_numeric))
-  #   
-  #   numeric_data <- temporary_dataset$data %>%
-  #     select(where(is.numeric))
-  #   
-  #   numeric_data %>% 
-  #     summarise_all(list(mean, median , max, min))
-  # })
   
   output$summary <- renderUI({
     summarytools::view(summarytools::dfSummary(temporary_dataset$data, justify = "center"), method = "render")
@@ -62,9 +50,9 @@
   
   output$contents <- DT::renderDataTable({
     if(input$data_disp == "head") {
-      data <- datatable(head(original_dataset()), options = list(scrollX = T, scrollY= T))
+      data <- datatable(head(temporary_dataset$data), options = list(scrollX = T, scrollY= T))
     } else {
-      data <- datatable(original_dataset(), options = list(scrollX = T))
+      data <- datatable(temporary_dataset$data, options = list(scrollX = T))
     }
     
     data

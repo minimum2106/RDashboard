@@ -12,30 +12,6 @@
     shinyalert(ERROR(), type="error")
   })
   
-  # observeEvent(
-  #   input$data_file, {
-  #     updateSelectInput(
-  #       session, "fe_dataset", "Choose Dataset",
-  #       choices = dataset_collection$names)
-  #     
-  #     updateSelectInput(
-  #       session, "view_dataset", "Choose Dataset",
-  #       choices = dataset_collection$names) 
-  #     
-  #     updateSelectInput(
-  #       session, "summary_dataset", "Choose Dataset",
-  #       choices = dataset_collection$names) 
-  #     
-  #     updateSelectInput(
-  #       session, "viz_dataset", "Choose Dataset",
-  #       choices = dataset_collection$names) 
-  #     
-  #     updateSelectInput(
-  #       session, "ml_dataset", "Choose Dataset",
-  #       choices = dataset_collection$names) 
-  #   }
-  # )
-  
   observeEvent(
     input$fe_add_dataset,
     shinyalert('Enter a new dataset name', type='input', callbackR = callback_add_dataset)
@@ -56,30 +32,85 @@
       session, "fe_dataset", "Choose Dataset",
       choices = dataset_collection$names)
     
-    # updateSelectInput(
-    #   session, "view_dataset", "Choose Dataset",
-    #   choices = dataset_collection$names) 
-    # 
-    # updateSelectInput(
-    #   session, "summary_dataset", "Choose Dataset",
-    #   choices = dataset_collection$names) 
-    # 
-    # updateSelectInput(
-    #   session, "viz_dataset", "Choose Dataset",
-    #   choices = dataset_collection$names) 
-    # 
-    # updateSelectInput(
-    #   session, "ml_dataset", "Choose Dataset",
-    #   choices = dataset_collection$names) 
+    updateSelectInput(
+      session, "view_dataset", "Choose Dataset",
+      choices = dataset_collection$names)
+
+    updateSelectInput(
+      session, "summary_dataset", "Choose Dataset",
+      choices = dataset_collection$names)
+
+    updateSelectInput(
+      session, "viz_dataset", "Choose Dataset",
+      choices = dataset_collection$names)
+
+    updateSelectInput(
+      session, "ml_dataset", "Choose Dataset",
+      choices = dataset_collection$names)
   }
   
-  observeEvent(
+  observeEvent( {
     input$fe_dataset
+    input$view_dataset
+    input$ml_dataset
+    input$viz_dataset
+    input$summary_dataset
+  }
+    
     ,
     {
-      temp_dataset <- original_dataset()
-      temporary_dataset$transformations <- dataset_collection$dataset_config[[convert_name(input$fe_dataset)]]
+      new_dataset = "STOP"
       
+      if (current_dataset() != input$fe_dataset) {
+        new_dataset <- input$fe_dataset
+      }
+      
+      if (current_dataset() != input$ml_dataset) {
+        new_dataset <- input$ml_dataset
+      }
+      
+      if (current_dataset() != input$viz_dataset) {
+        new_dataset <- input$viz_dataset
+      }
+      
+      if (current_dataset() != input$view_dataset) {
+        new_dataset <- input$view_dataset
+      }
+      
+      if (current_dataset() != input$summary_dataset) {
+        new_dataset <- input$summary_dataset
+      }
+      
+      if (new_dataset == "STOP") {
+        return()
+      }
+      
+      updateSelectInput(
+        session, "fe_dataset", "Choose Dataset",
+        selected = new_dataset)
+      
+      updateSelectInput(
+        session, "view_dataset", "Choose Dataset",
+        selected = new_dataset)
+      
+      updateSelectInput(
+        session, "summary_dataset", "Choose Dataset",
+        selected = new_dataset)
+      
+      updateSelectInput(
+        session, "viz_dataset", "Choose Dataset",
+        selected = new_dataset)
+      
+      updateSelectInput(
+        session, "ml_dataset", "Choose Dataset",
+        selected = new_dataset)
+      
+      current_dataset(new_dataset)
+      
+      temp_dataset <- original_dataset()
+      temporary_dataset$transformations <- dataset_collection$dataset_config[[convert_name(current_dataset())]]
+      
+
       for (transformation in temporary_dataset$transformations) {
         if (transformation$name == 'Rename') {
           temp_dataset <- temp_dataset %>% 
@@ -120,7 +151,7 @@
               mutate_at(c(transformation$column), ~na_if(., '')) %>% 
               drop_na(!!transformation$column)
           }
-            
+          
         }
         
         if (transformation$name == 'Mutate') {
@@ -166,8 +197,13 @@
       }
       
       temporary_dataset$data <- temp_dataset
+      
     }
   )
+  
+  observe({
+ 
+  })
   
   observeEvent(
     input$fe_dataset, {
@@ -277,8 +313,6 @@
     datatable(temporary_dataset$data, options=list(scrollX = T, scrollY = T, lengthMenu = c(15, 25, 35)))
   })
   
-  
-  
   observeEvent({
     input$fe_options
     input$fe_columns
@@ -306,6 +340,7 @@
   
   observeEvent(
     input$fe_transform, {
+      
       new_dataset <- temporary_dataset$data
       
       if (input$fe_options == "Rename") {
@@ -336,6 +371,7 @@
             temporary_dataset$transformations,
             list(list(name = input$fe_options, condition = input$fe_filter_condition))
           )
+          
         }, error = function(e) {ERROR("Invalid condition")}
         ) 
       }
@@ -449,8 +485,6 @@
               )
               )
             )
-            
-            print("done exponential")
           }
         }, error = function(e) {ERROR("Unsuccessful Mutation")})
         
@@ -543,7 +577,7 @@
         }, error = function(e) {ERROR("Invalid Condition")}
         )
       }
-    
+      
       temporary_dataset$data <- new_dataset
     }
   )
