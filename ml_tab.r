@@ -70,7 +70,8 @@ sidebar_ml_svm <- conditionalPanel(
   sidebar_ml_svm_coef0
 )
 
-sidebar_ml <- sidebarPanel(
+sidebar_ml <- conditionalPanel(
+  condition = "input.ml_panels == 'Summary'",
   selectInput(
     "ml_dataset",
     "Choose Dataset",
@@ -83,13 +84,6 @@ sidebar_ml <- sidebarPanel(
     choices = ""
   ),
   
-  selectInput(
-    "ml_var_options",
-    "Explanatory Variables:",
-    choices = "",
-    multiple = TRUE,
-  ),
-
   selectInput(
     "ml_model_options", 
     "Model", 
@@ -123,19 +117,46 @@ sidebar_ml <- sidebarPanel(
     "ml_run_model", "Run Model", width = "100%",
     style="color: #fff; background-color: #337ab7; border-color: #2e6da4"
   ),
+)
+
+sidebar_ml_viz_svm <- conditionalPanel(
+  condition = "input.ml_model_options == 'SVM'",
+  selectInput(
+    "ml_svm_viz_option_1",
+    "X:",
+    choices = ""
+  ),
   
+  selectInput(
+    "ml_svm_viz_option_2",
+    "Y:",
+    choices = ""
+  ),
+  
+  actionButton(
+    "ml_svm_viz_generate", "Generate Visualization", width = "100%",
+    style="color: #fff; background-color: #337ab7; border-color: #2e6da4"
+  ),
+)
+
+sidebar_ml_viz <- conditionalPanel(
+  condition = "input.ml_panels == 'Visualizations'",
+  
+  sidebar_ml_viz_svm
 )
 
 ml_content <- tabsetPanel(
   type = "tabs",
-  tabPanel("Summary", h3("hi")),
-  tabPanel("Predict", h3("hello")),
+  tabPanel("Summary", verbatimTextOutput("ml_summary")),
   tabPanel("Visualizations", plotOutput("ml_viz")),
   id = "ml_panels"
 )
 
 
 ml_tab <-  sidebarLayout(
-  sidebar_ml,
+  sidebarPanel(
+    sidebar_ml,
+    sidebar_ml_viz
+  ),
   mainPanel(ml_content)
 )

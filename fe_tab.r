@@ -63,6 +63,20 @@ sidebar_fe_not_filter <- conditionalPanel(
     choices = ""
   ),
 )
+
+sidebar_fe_cdatatype <- conditionalPanel(
+  condition = "input.fe_options == 'Change Datatype'",
+  selectInput(
+    "fe_cd_methods",
+    "Change to:",
+    choices = c(
+      "Integer",
+      "Numeric",
+      "Factor",
+      "Character"
+    )
+  )
+)
 # based sidebar for Feature Engineering page
 sidebar_fe <- sidebarPanel(
   
@@ -81,7 +95,14 @@ sidebar_fe <- sidebarPanel(
   selectInput(
     "fe_options", 
     "Transformation", 
-    choices = c("Filter", "Mutate", "Encoding", "Rename", "Handle Missing Values")
+    choices = c(
+      "Filter", 
+      "Mutate", 
+      "Encoding", 
+      "Rename", 
+      "Handle Missing Values",
+      "Remove Column",
+      "Change Datatype")
   )
   , 
   sidebar_fe_not_filter,
@@ -92,6 +113,7 @@ sidebar_fe <- sidebarPanel(
   sidebar_fe_encoding,
   sidebar_fe_rename,
   sidebar_fe_mv,
+  sidebar_fe_cdatatype,
   
   # launch the transformation
   actionButton(

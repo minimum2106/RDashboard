@@ -112,6 +112,11 @@
       
 
       for (transformation in temporary_dataset$transformations) {
+        if (transformation$name == "Remove Column") {
+          temp_dataset <- temp_dataset %>% 
+            select(-as.symbol(transformation$old_name))
+        }
+        
         if (transformation$name == 'Rename') {
           temp_dataset <- temp_dataset %>% 
             rename(!!transformation$new_name := !!transformation$old_name)
@@ -194,6 +199,28 @@
             temp_dataset[[input$fe_columns]] <- as.numeric(factor(temp_dataset[[transformation$column]]))
           }
         }
+        
+        if (transformation$name == 'Change Datatype') {
+          if (transformation$method == "Integer") {
+            temp_dataset <- temp_dataset %>% 
+              mutate(!!transformation$column := as_integer(temp_dataset[[transformation$column]]))
+          }
+          
+          if (transformation$method == "Numeric") {
+            temp_dataset <- temp_dataset %>% 
+              mutate(!!transformation$column := as_numeric(temp_dataset[[transformation$column]]))
+          }
+          
+          if (transformation$method == "Character") {
+            temp_dataset <- temp_dataset %>% 
+              mutate(!!transformation$column := as_character(temp_dataset[[transformation$column]]))
+          }
+          
+          if (transformation$method == "Factor") {
+            temp_dataset <- temp_dataset %>% 
+              mutate(!!transformation$column := as_factor_self(temp_dataset[[transformation$column]]))
+          }
+        }
       }
       
       temporary_dataset$data <- temp_dataset
@@ -217,6 +244,15 @@
         trans_value_placeholder = "Value:"
         
         for (transformation in temporary_dataset$transformations){
+          
+          if (transformation$name == "Remove Column") {
+            trans_content <- paste(
+              paste(trans_name_placeholder, transformation$name, sep=" "),
+              paste("Column::", transformation$column, sep=" "),
+              sep = line_break
+            )
+          }
+          
           if (transformation$name == "Rename") {
             trans_content <- paste(
               paste(trans_name_placeholder, transformation$name, sep=" "),
@@ -302,6 +338,15 @@
             }
           }
           
+          if (transformation$name == "Change Datatype") {
+            trans_content <- paste(
+              paste(trans_name_placeholder, transformation$name, sep=" "),
+              paste("Column:", transformation$column, sep=" "),
+              paste("Method:", transformation$method, sep=" "),
+              sep = line_break
+            )
+          }
+          
           trans_format <- paste(trans_format, trans_break, trans_content, sep="\n")
         }
         
@@ -342,6 +387,24 @@
     input$fe_transform, {
       
       new_dataset <- temporary_dataset$data
+      
+      if (input$fe_options == "Remove Column") {
+        tryCatch({
+          new_dataset <- new_dataset  %>%
+            select(-as.symbol(!!input$fe_columns))
+          
+          temporary_dataset$transformations <- append(
+            temporary_dataset$transformations,
+            list(list(name = input$fe_options, column = input$fe_columns))
+          )
+          
+          updateSelectInput(
+            session, "fe_columns",
+            choices = colnames(new_dataset)
+          )
+        }, error = function(e) {ERROR("Invalid Transformation")}
+        )
+      }
       
       if (input$fe_options == "Rename") {
         tryCatch({
@@ -576,6 +639,68 @@
           }
         }, error = function(e) {ERROR("Invalid Condition")}
         )
+      }
+      
+      if (input$fe_options == "Change Datatype") {
+        if (input$fe_cd_methods == "Factor") {
+          new_dataset <- new_dataset %>% 
+            mutate(!!input$fe_columns := as_factor_self(new_dataset[[input$fe_columns]]))
+          
+          temporary_dataset$transformations <- append(
+            temporary_dataset$transformations,
+            list(list(
+              name = input$fe_options, 
+              method = input$fe_cd_methods,
+              column = input$fe_columns
+            )
+            )
+          )
+        }
+        
+        if (input$fe_cd_methods == "Integer") {
+          new_dataset <- new_dataset %>% 
+            mutate(!!input$fe_columns := as_integer(new_dataset[[input$fe_columns]]))
+          
+          temporary_dataset$transformations <- append(
+            temporary_dataset$transformations,
+            list(list(
+              name = input$fe_options, 
+              method = input$fe_cd_methods,
+              column = input$fe_columns
+            )
+            )
+          )
+        }
+        
+        if (input$fe_cd_methods == "Numeric") {
+          new_dataset <- new_dataset %>% 
+            mutate(!!input$fe_columns := as_numeric(new_dataset[[input$fe_columns]]))
+          
+          temporary_dataset$transformations <- append(
+            temporary_dataset$transformations,
+            list(list(
+              name = input$fe_options, 
+              method = input$fe_cd_methods,
+              column = input$fe_columns
+            )
+            )
+          )
+        }
+        
+        if (input$fe_cd_methods == "Character") {
+          new_dataset <- new_dataset %>% 
+            mutate(!!input$fe_columns := as_character(new_dataset[[input$fe_columns]]))
+          
+          temporary_dataset$transformations <- append(
+            temporary_dataset$transformations,
+            list(list(
+              name = input$fe_options, 
+              method = input$fe_cd_methods,
+              column = input$fe_columns
+            )
+            )
+          )
+        }
       }
       
       temporary_dataset$data <- new_dataset
