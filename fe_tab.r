@@ -109,7 +109,7 @@ sidebar_fe <- sidebarPanel(
   sidebar_fe_encoding,
   sidebar_fe_rename,
   sidebar_fe_mv,
-  # sidebar_fe_cdatatype,
+  sidebar_fe_cdatatype,
   
   # launch the transformation
   actionButton(
