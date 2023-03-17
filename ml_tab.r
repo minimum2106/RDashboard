@@ -12,9 +12,9 @@ sidebar_ml_split_percentage <-  conditionalPanel(
  
 )
 
-# sidebar_ml_cross_validation <- conditionalPanel(
-#   condition = "input.ml_spliting_options == 'Cross Validation'",
-# )
+sidebar_ml_cross_validation <- conditionalPanel(
+  condition = "input.ml_spliting_options == 'Cross Validation'",
+)
 
 sidebar_ml_svm_degree <- conditionalPanel(
   condition = "input.ml_model_options == 'SVM' & input.ml_svm_kernel == 'polynomial'",
@@ -77,23 +77,23 @@ sidebar_ml <- conditionalPanel(
     "Choose Dataset",
     choices = ""
   ),
-  
+
   selectInput(
     "ml_target_options",
     "Target Column",
     choices = ""
   ),
-  
+
   selectInput(
-    "ml_model_options", 
-    "Model", 
+    "ml_model_options",
+    "Model",
     choices = c(
-      "Naive Bayes", 
-      "Logistic Regression", 
+      "Naive Bayes",
+      "Logistic Regression",
       "SVM"
       )
   ),
-  
+
   selectInput(
     "ml_spliting_options",
     "Train / Test Spliting Method:",
@@ -126,7 +126,7 @@ sidebar_ml_viz_svm <- conditionalPanel(
     "X:",
     choices = ""
   ),
-  
+
   selectInput(
     "ml_svm_viz_option_2",
     "Y:",

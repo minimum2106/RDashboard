@@ -19,19 +19,40 @@
         session, inputId = "fe_columns",
         choices = colnames(original_dataset()))
       
-      columns <- prepend(colnames(original_dataset()), "")
+      columns <- prepend(colnames(original_dataset()), "NONE")
       
-      updateSelectizeInput(
-        session, inputId = "viz_var_1",
-        choices = columns,
-        selected = NULL,
-        options = list(maxItems = 1))
-      
-      updateSelectizeInput(
-        session, inputId = "viz_var_2",
-        choices = columns,
-        selected = NULL,
-        options = list(maxItems = 1))
+      if (input$viz_type %in% c("Distribution", "Density")) {
+        
+        non_numeric_options <-  colnames(original_dataset() %>% select(where(non_numeric)))
+        non_numeric_options <-  prepend(non_numeric_options, "NONE")
+        
+        numeric_options <-  colnames(original_dataset() %>% select(where(is.numeric)))
+        numeric_options <-  prepend(numeric_options, "NONE")
+        
+        updateSelectizeInput(
+          session, inputId = "viz_var_1",
+          choices = numeric_options,
+          selected = NULL,
+          options = list(maxItems = 1))
+        
+        updateSelectizeInput(
+          session, inputId = "viz_var_2",
+          choices = non_numeric_options,
+          selected = NULL,
+          options = list(maxItems = 1))
+      }else {
+        updateSelectizeInput(
+          session, inputId = "viz_var_1",
+          choices = columns,
+          selected = NULL,
+          options = list(maxItems = 1))
+        
+        updateSelectizeInput(
+          session, inputId = "viz_var_2",
+          choices = columns,
+          selected = NULL,
+          options = list(maxItems = 1)) 
+      }
       
       updateSelectizeInput(
         session, inputId = "viz_color",
@@ -49,26 +70,47 @@
     
   )
   
+ 
   
   observe({
     updateSelectInput(
       session, inputId = "fe_columns",
       choices = colnames(temporary_dataset$data))
     
-    columns <- prepend(colnames(temporary_dataset$data), "")
+    columns <- prepend(colnames(temporary_dataset$data), "NONE")
     
-    
-    updateSelectizeInput(
-      session, inputId = "viz_var_1",
-      choices = columns,
-      selected = NULL,
-      options = list(maxItems = 1))
-    
-    updateSelectizeInput(
-      session, inputId = "viz_var_2",
-      choices = columns,
-      selected = NULL,
-      options = list(maxItems = 1))
+    if (input$viz_type %in% c("Distribution", "Density")) {
+      
+      non_numeric_options <-  colnames(temporary_dataset$data %>% select(where(non_numeric)))
+      non_numeric_options <-  prepend(non_numeric_options, "NONE")
+      
+      numeric_options <-  colnames(temporary_dataset$data %>% select(where(is.numeric)))
+      numeric_options <-  prepend(numeric_options, "NONE")
+      
+      updateSelectizeInput(
+        session, inputId = "viz_var_1",
+        choices = numeric_options,
+        selected = NULL,
+        options = list(maxItems = 1))
+      
+      updateSelectizeInput(
+        session, inputId = "viz_var_2",
+        choices = non_numeric_options,
+        selected = NULL,
+        options = list(maxItems = 1))
+    }else {
+      updateSelectizeInput(
+        session, inputId = "viz_var_1",
+        choices = columns,
+        selected = NULL,
+        options = list(maxItems = 1))
+      
+      updateSelectizeInput(
+        session, inputId = "viz_var_2",
+        choices = columns,
+        selected = NULL,
+        options = list(maxItems = 1)) 
+    }
     
     updateSelectizeInput(
       session, inputId = "viz_color",
@@ -98,94 +140,103 @@
   observeEvent(
     input$viz_generate,
     {
+      
       viz <- temporary_dataset$data %>% 
         ggplot()
       
+      
       if (input$viz_type == "Distribution") {
-        
-        if (input$viz_var_1 != "" & input$viz_var_2 == "") {
-          viz <- temporary_dataset$data %>% 
-            ggplot(aes_string(input$viz_var_1)) +
-            geom_histogram(binwidth=.5)
-        }
-        
-        if (input$viz_var_1 != "" & input$viz_var_2 != "") {
-          viz <- temporary_dataset$data %>%
-            ggplot(aes_string(x = input$viz_var_1, fill = input$viz_var_2)) +
-            geom_histogram(binwidth=.5)
-        }
+        tryCatch({
+          if (input$viz_var_1 != "NONE" & input$viz_var_2 == "NONE") {
+            viz <- temporary_dataset$data %>% 
+              ggplot(aes_string(input$viz_var_1)) +
+              geom_histogram(binwidth=.5, fill="lightblue")
+          }
+          
+          if (input$viz_var_1 != "NONE" & input$viz_var_2 != "NONE") {
+            viz <- temporary_dataset$data %>%
+              ggplot(aes_string(x = input$viz_var_1, fill = input$viz_var_2)) +
+              geom_histogram(binwidth=.5)
+          }
+        }, error = function(e) {print(e)})
       }
       
       if (input$viz_type == "Density") {
-        
-        if (input$viz_var_1 != "" & input$viz_var_2 != "") {
-          viz <- temporary_dataset$data %>%
-            ggplot(aes_string(x = input$viz_var_1, fill = input$viz_var_2)) +
-            geom_density(alpha=.3)
-        }
-        
-        if (input$viz_var_1 != "" & input$viz_var_2 == "") {
-          viz <- temporary_dataset$data %>%
-            ggplot(aes_string(input$viz_var_1)) +
-            geom_density(alpha=.3)
-        }
+        tryCatch({
+          if (input$viz_var_1 != "NONE" & input$viz_var_2 != "NONE") {
+            viz <- temporary_dataset$data %>%
+              ggplot(aes_string(x = input$viz_var_1, fill = input$viz_var_2)) +
+              geom_density(fill="lightblue")
+          }
+          
+          if (input$viz_var_1 != "NONE" & input$viz_var_2 == "NONE") {
+            viz <- temporary_dataset$data %>%
+              ggplot(aes_string(input$viz_var_1)) +
+              geom_density()
+          }
+        }, error = function(e) {print(e)})
       }
       
       if (input$viz_type == "Boxplot") {
-        if (input$viz_var_1 != "" & input$viz_var_2 == "") {
-          viz <- temporary_dataset$data %>%
-            ggplot(aes_string(input$viz_var_1)) +
-            geom_boxplot()
-        }
-        
-        if (input$viz_var_1 != "" & input$viz_var_2 != "") {
-          viz <- temporary_dataset$data %>%
-            ggplot(aes_string(input$viz_var_1, input$viz_var_2)) +
-            geom_boxplot()
-        }
+        tryCatch({
+          if (input$viz_var_1 != "NONE" & input$viz_var_2 == "NONE") {
+            viz <- temporary_dataset$data %>%
+              ggplot(aes_string(input$viz_var_1)) +
+              geom_boxplot()
+          }
+          
+          if (input$viz_var_1 != "NONE" & input$viz_var_2 != "NONE") {
+            viz <- temporary_dataset$data %>%
+              ggplot(aes_string(input$viz_var_1, input$viz_var_2)) +
+              geom_boxplot()
+          }
+        }, error = function(e) {print(e)})
       }
       
       
       if (input$viz_type == "Scatter") {
-        if (input$viz_var_1 != "" &
-            input$viz_var_2 != "" &
-            input$viz_color == "" &
-            input$viz_size == "") {
-          viz <- temporary_dataset$data %>% 
-            ggplot(aes_string(input$viz_var_1, input$viz_var_2)) +
-            geom_point()
-        }
-        
-        if (input$viz_var_1 != "" &
-            input$viz_var_2 != "" &
-            input$viz_color != "" &
-            input$viz_size == "") {
-          viz <- temporary_dataset$data %>% 
-            ggplot(aes_string(input$viz_var_1, input$viz_var_2)) +
-            geom_point(aes_string(color = input$viz_color))
-        }
-        
-        if (input$viz_var_1 != "" &
-            input$viz_var_2 != "" &
-            input$viz_color == "" &
-            input$viz_size != "") {
-          viz <- temporary_dataset$data %>% 
-            ggplot(aes_string(input$viz_var_1, input$viz_var_2)) +
-            geom_point(aes_string(size = input$viz_size))
-        }
-        
-        if (input$viz_var_1 != "" & 
-            input$viz_var_2 != "" &
-            input$viz_color != "" &
-            input$viz_size != "") {
-          viz <- temporary_dataset$data %>% 
-            ggplot(aes_string(input$viz_var_1, input$viz_var_2)) +
-            geom_point(aes_string(size = input$viz_size, color = input$viz_color))
-        }
-
+        tryCatch({
+      
+          if (input$viz_var_1 != "NONE" &
+              input$viz_var_2 != "NONE" &
+              input$viz_color == "NONE" &
+              input$viz_size == "NONE") {
+            
+            viz <- temporary_dataset$data %>% 
+              ggplot(aes_string(input$viz_var_1, input$viz_var_2)) +
+              geom_point()
+          }
+          
+          if (input$viz_var_1 != "NONE" &
+              input$viz_var_2 != "NONE" &
+              input$viz_color != "NONE" &
+              input$viz_size == "NONE") {
+            viz <- temporary_dataset$data %>% 
+              ggplot(aes_string(input$viz_var_1, input$viz_var_2)) +
+              geom_point(aes_string(color = input$viz_color))
+          }
+          
+          if (input$viz_var_1 != "NONE" &
+              input$viz_var_2 != "NONE" &
+              input$viz_color == "NONE" &
+              input$viz_size != "NONE") {
+            viz <- temporary_dataset$data %>% 
+              ggplot(aes_string(input$viz_var_1, input$viz_var_2)) +
+              geom_point(aes_string(size = input$viz_size))
+          }
+          
+          if (input$viz_var_1 != "NONE" & 
+              input$viz_var_2 != "NONE" &
+              input$viz_color != "NONE" &
+              input$viz_size != "NONE") {
+            viz <- temporary_dataset$data %>% 
+              ggplot(aes_string(input$viz_var_1, input$viz_var_2)) +
+              geom_point(aes_string(size = input$viz_size, color = input$viz_color))
+          }
+          
+        }, error = function(e) {})
       }
       
-     
       output$data_viz <- renderPlot({viz})
     }
   )

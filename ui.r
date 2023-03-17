@@ -13,6 +13,6 @@ ui <- fluidPage(
     "RDashboard",
     tabPanel( "Data", data_tab),
     tabPanel("Feature Engineering", fe_tab),
-    tabPanel("Model", ml_tab),
+    tabPanel("Model", ml_tab)
   )
 )

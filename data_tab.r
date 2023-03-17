@@ -79,6 +79,12 @@ sidebar_data_scatter <- conditionalPanel(
   selectizeInput("viz_size", "Size Column", choices = ""),
 )
 
+sidebar_non_correlation <- conditionalPanel(
+  condition = "input.viz_type != 'Correlation'",
+  selectizeInput("viz_var_1", "Variable 1:", choices = ""),
+  selectizeInput("viz_var_2", "Variable 2:", choices = ""),
+)
+
 
 sidebar_viz <- conditionalPanel(
   condition="input.data_panels == 'Visualizations'",
@@ -87,18 +93,20 @@ sidebar_viz <- conditionalPanel(
     "Choose Dataset",
     choices = ""
   ),
-  
+
   selectInput(
-    "viz_type", "Viz Type", 
+    "viz_type", "Viz Type",
     choices = c(
       "Distribution",
       "Density",
       "Boxplot",
       "Scatter",
-      "Density"
-    )),
-  selectizeInput("viz_var_1", "Variable 1:", choices = ""),
-  selectizeInput("viz_var_2", "Variable 2:", choices = ""),
+      "Density",
+      "Correlation"
+    )
+  ),
+
+  sidebar_non_correlation,
   
   sidebar_data_univar_dist,
   sidebar_data_univar_density,

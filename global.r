@@ -34,29 +34,9 @@ match_or_not <- function(x, y) {
 
 non_numeric <- function(x) !is.numeric(x)
 
-as_integer <- function(x) {
-  if (is.factor(x)) {
-    int <- sshhr(levels(x) %>% .[x] %>% as.integer())
-    if (length(na.omit(int)) == 0) as.integer(x) else int
-  } else if (is.character(x)) {
-    int <- sshhr(as.integer(x))
-    if (length(na.omit(int)) == 0) as_integer(as.factor(x)) else int
-  } else {
-    as.integer(x)
-  }
-}
+as_integer <- function(x) as.integer(x)
 
-as_numeric <- function(x) {
-  if (is.factor(x)) {
-    num <- sshhr(levels(x) %>% .[x] %>% as.numeric())
-    if (length(na.omit(num)) == 0) as.numeric(x) else num
-  } else if (is.character(x)) {
-    num <- sshhr(as.numeric(x))
-    if (length(na.omit(num)) == 0) as_numeric(as.factor(x)) else num
-  } else {
-    as.numeric(x)
-  }
-}
+as_numeric <- function(x) as.numeric(x)
 
 as_factor_self <- function(x, ordered = FALSE) factor(x, ordered = ordered)
 
