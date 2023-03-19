@@ -237,6 +237,14 @@
         }, error = function(e) {})
       }
       
+      if (input$viz_type == "Correlation") {
+        tryCatch({
+          viz <- temporary_dataset$data %>% 
+            ggpairs(aes(color=diagnosis, alpha=0.75), lower=list(continuous="smooth"))+ theme_bw()+
+            theme(plot.title=element_text(face='bold',color='black',hjust=0.5,size=12))
+        },error = function(e){print(e)})
+      }
+      
       output$data_viz <- renderPlot({viz})
     }
   )
